@@ -1,0 +1,117 @@
+* Build loading test for caveman2
+
+#+begin_src sh :exports code :results pp
+make caveman2
+#+end_src
+
+#+RESULTS:
+#+begin_example
+cp docker/caveman2/Dockerfile ./
+docker build ./ -t loading-test-caveman2
+Sending build context to Docker daemon  108.2MB
+Step 1/13 : FROM ubuntu
+ ---> 1e4467b07108
+Step 2/13 : MAINTAINER lagagain
+ ---> Using cache
+ ---> 03eb84daee91
+Step 3/13 : RUN apt-get update -y
+ ---> Using cache
+ ---> 35774b920fc4
+Step 4/13 : RUN apt-get install -y ca-certificates
+ ---> Using cache
+ ---> 2b2db3817150
+Step 5/13 : RUN apt-get install -y libev4 sbcl curl
+ ---> Using cache
+ ---> c6f77c85b4fd
+Step 6/13 : WORKDIR /tmp
+ ---> Using cache
+ ---> 53c4234fef4e
+Step 7/13 : RUN curl -O https://beta.quicklisp.org/quicklisp.lisp
+ ---> Using cache
+ ---> 51e32611ea24
+Step 8/13 : COPY caveman2-app/quicklisp-install.lisp ./
+ ---> Using cache
+ ---> 1fc7828e2645
+Step 9/13 : RUN sbcl --load quicklisp-install
+ ---> Using cache
+ ---> ed78b30cdcc9
+Step 10/13 : RUN rm quicklisp.lisp quicklisp-install.lisp
+ ---> Using cache
+ ---> 85547d7abbb7
+Step 11/13 : COPY caveman2-app  ./
+ ---> Using cache
+ ---> 4e0e9fe91f9d
+Step 12/13 : WORKDIR caveman2-app
+ ---> Using cache
+ ---> a6db8c810f1f
+Step 13/13 : CMD ["sbcl", "--file", "run-app"]
+ ---> Using cache
+ ---> da6c785114c1
+Successfully built da6c785114c1
+Successfully tagged loading-test-caveman2:latest
+rm Dockerfile
+#+end_example
+
+* Start Caveman2
+
+#+begin_src sh :exports code :results none
+docker run -it -p 8080:8080 loading-test-caveman2
+#+end_src
+
+* Build loading test for rails
+
+#+begin_src sh :exports code :results pp
+make rails
+#+end_src
+
+#+RESULTS:
+#+begin_example
+cp docker/rails/Dockerfile ./
+docker build ./  -t loading-test-rails
+Sending build context to Docker daemon  108.2MB
+Step 1/9 : FROM lagagain/rails
+ ---> cc4d30d3da25
+Step 2/9 : MAINTAINER lagagain
+ ---> Using cache
+ ---> a04a2f253869
+Step 3/9 : COPY railsApp ./
+ ---> Using cache
+ ---> 01a4508a0455
+Step 4/9 : WORKDIR railsApp
+ ---> Using cache
+ ---> 5af9edd1daaf
+Step 5/9 : RUN bundle install
+ ---> Using cache
+ ---> fac438748e84
+Step 6/9 : RUN yarn install --check-files
+ ---> Using cache
+ ---> 35ea73b2c52c
+Step 7/9 : RUN rails webpacker:install
+ ---> Using cache
+ ---> c4f7cb5f3c60
+Step 8/9 : EXPOSE 3000
+ ---> Using cache
+ ---> 9055e2caef64
+Step 9/9 : CMD ["rails", "server", "-b", "0.0.0.0"]
+ ---> Using cache
+ ---> 7cccba6f3584
+Successfully built 7cccba6f3584
+Successfully tagged loading-test-rails:latest
+rm Dockerfile
+#+end_example
+
+
+
+* Start Rails
+
+#+begin_src sh :exports code :results none
+docker run -it -p 8080:3000 loading-test-rails
+#+end_src
+
+
+* Loading Test
+
+1. Open JMeter
+2. Open file `./loading test.jmx`
+3. change port and thread
+4. run test
