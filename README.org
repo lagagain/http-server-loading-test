@@ -108,6 +108,9 @@ rm Dockerfile
 docker run -it -p 8080:3000 loading-test-rails
 #+end_src
 
+* phx.server
+
+https://hexdocs.pm/phoenix/installation.html#content
 
 * Loading Test
 
